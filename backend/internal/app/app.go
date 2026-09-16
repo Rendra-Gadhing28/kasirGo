@@ -16,31 +16,10 @@ import (
 
 func SetupApp() *fiber.App {
 	cfg := config.LoadConfig()
-	db := database.InitDB()
-	database.SeedData(db)
-
-	userRepo := repository.NewUserRepository(db)
-	categoryRepo := repository.NewCategoryRepository(db)
-	productRepo := repository.NewProductRepository(db)
-	customerRepo := repository.NewCustomerRepository(db)
-	supplierRepo := repository.NewSupplierRepository(db)
-	transRepo := repository.NewTransactionRepository(db)
-
-	authService := service.NewAuthService(userRepo)
-	categoryService := service.NewCategoryService(categoryRepo)
-	productService := service.NewProductService(productRepo)
-	customerService := service.NewCustomerService(customerRepo, userRepo)
-	supplierService := service.NewSupplierService(supplierRepo)
-	transService := service.NewTransactionService(transRepo, productRepo, customerRepo)
-	midtransService := service.NewMidtransPaymentService(transRepo, customerRepo)
-
-	authHandler := handler.NewAuthHandler(authService)
-	categoryHandler := handler.NewCategoryHandler(categoryService)
-	productHandler := handler.NewProductHandler(productService)
-	customerHandler := handler.NewCustomerHandler(customerService)
-	supplierHandler := handler.NewSupplierHandler(supplierService)
-	transHandler := handler.NewTransactionHandler(transService, midtransService)
-	dashboardHandler := handler.NewDashboardHandler(db)
+	db, dbErr := database.InitDB()
+	if db != nil && dbErr == nil {
+		database.SeedData(db)
+	}
 
 	app := fiber.New(fiber.Config{
 		AppName:      cfg.AppName,
@@ -66,12 +45,59 @@ func SetupApp() *fiber.App {
 
 	api := app.Group("/api/v1")
 
+	// Health check endpoint (always responds even if DB connection failed)
 	api.Get("/health", func(c *fiber.Ctx) error {
+		if dbErr != nil {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"success": false,
+				"message": "Database belum terhubung",
+				"error":   dbErr.Error(),
+				"db_host": cfg.DBHost,
+				"app":     cfg.AppName,
+			})
+		}
 		return utils.SuccessResponse(c, fiber.StatusOK, "KasirPro backend is healthy and running", fiber.Map{
-			"version": "1.0.0",
-			"app":     cfg.AppName,
+			"version":  "1.0.0",
+			"app":      cfg.AppName,
+			"database": "connected",
 		})
 	})
+
+	// If database failed to connect, return 503 error for all functional endpoints
+	if dbErr != nil {
+		api.All("/*", func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"success": false,
+				"message": "Database tidak dapat diakses",
+				"error":   dbErr.Error(),
+				"db_host": cfg.DBHost,
+			})
+		})
+		return app
+	}
+
+	userRepo := repository.NewUserRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
+	productRepo := repository.NewProductRepository(db)
+	customerRepo := repository.NewCustomerRepository(db)
+	supplierRepo := repository.NewSupplierRepository(db)
+	transRepo := repository.NewTransactionRepository(db)
+
+	authService := service.NewAuthService(userRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
+	productService := service.NewProductService(productRepo)
+	customerService := service.NewCustomerService(customerRepo, userRepo)
+	supplierService := service.NewSupplierService(supplierRepo)
+	transService := service.NewTransactionService(transRepo, productRepo, customerRepo)
+	midtransService := service.NewMidtransPaymentService(transRepo, customerRepo)
+
+	authHandler := handler.NewAuthHandler(authService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+	productHandler := handler.NewProductHandler(productService)
+	customerHandler := handler.NewCustomerHandler(customerService)
+	supplierHandler := handler.NewSupplierHandler(supplierService)
+	transHandler := handler.NewTransactionHandler(transService, midtransService)
+	dashboardHandler := handler.NewDashboardHandler(db)
 
 	authGroup := api.Group("/auth", middleware.AuthRateLimiter())
 	authGroup.Post("/register", authHandler.Register)

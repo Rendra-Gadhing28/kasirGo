@@ -40,7 +40,7 @@ func parseDatabaseURL(rawURL string) string {
 	return rawURL
 }
 
-func InitDB() *gorm.DB {
+func InitDB() (*gorm.DB, error) {
 	cfg := config.AppConfig
 
 	var dsn string
@@ -48,7 +48,7 @@ func InitDB() *gorm.DB {
 		dsn = parseDatabaseURL(cfg.DatabaseURL)
 	} else {
 		tlsParam := ""
-		if cfg.DBSSL == "true" || cfg.DBSSL == "1" || cfg.DBSSL == "require" || cfg.DBSSL == "skip-verify" {
+		if cfg.DBSSL == "true" || cfg.DBSSL == "1" || cfg.DBSSL == "require" || cfg.DBSSL == "skip-verify" || strings.Contains(cfg.DBHost, "tidbcloud.com") {
 			if cfg.DBSSL == "skip-verify" {
 				tlsParam = "&tls=skip-verify"
 			} else {
@@ -56,7 +56,7 @@ func InitDB() *gorm.DB {
 			}
 		}
 
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local%s",
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=10s%s",
 			cfg.DBUser,
 			cfg.DBPassword,
 			cfg.DBHost,
@@ -73,43 +73,45 @@ func InitDB() *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(gormLogLevel),
-		// Parameterized queries are always enforced by GORM
 	})
 	if err != nil {
 		log.Printf("Gagal terhubung ke MySQL database: %v", err)
-		panic(fmt.Sprintf("Gagal terhubung ke MySQL database: %v", err))
+		return nil, fmt.Errorf("koneksi database ke %s:%s gagal: %w", cfg.DBHost, cfg.DBPort, err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Printf("Gagal mendapatkan database instance: %v", err)
-		panic(fmt.Sprintf("Gagal mendapatkan database instance: %v", err))
+		return nil, fmt.Errorf("gagal sqlDB: %w", err)
 	}
 
-	// Connection Pool settings for high performance and stability
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetMaxOpenConns(50)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Println("Koneksi MySQL database berhasil diinisialisasi.")
 
-	// Run Auto Migrations
-	err = db.AutoMigrate(
-		&model.Outlet{},
-		&model.User{},
-		&model.Category{},
-		&model.Product{},
-		&model.Customer{},
-		&model.Supplier{},
-		&model.Transaction{},
-		&model.TransactionItem{},
-		&model.ExpenseIncome{},
-	)
-	if err != nil {
-		log.Fatalf("Gagal auto migrate schema database: %v", err)
+	// Run Auto Migrations only if tables not present yet to avoid serverless timeout
+	if !db.Migrator().HasTable(&model.Outlet{}) {
+		log.Println("Tabel belum ada, menjalankan auto-migration...")
+		err = db.AutoMigrate(
+			&model.Outlet{},
+			&model.User{},
+			&model.Category{},
+			&model.Product{},
+			&model.Customer{},
+			&model.Supplier{},
+			&model.Transaction{},
+			&model.TransactionItem{},
+			&model.ExpenseIncome{},
+		)
+		if err != nil {
+			log.Printf("Peringatan auto-migration: %v", err)
+		} else {
+			log.Println("Auto-migration database schema selesai.")
+		}
 	}
-	log.Println("Auto-migration database schema selesai.")
 
 	DB = db
-	return db
+	return db, nil
 }
