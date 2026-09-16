@@ -9,6 +9,8 @@
   import Input from '$lib/components/ui/Input.svelte';
   import Modal from '$lib/components/ui/Modal.svelte';
   import Badge from '$lib/components/ui/Badge.svelte';
+  import BarcodeScannerModal from '$lib/components/pos/BarcodeScannerModal.svelte';
+  import { lookupBarcodeInfo } from '$lib/utils/barcodeLookup';
 
   let products = $state<Product[]>([]);
   let categories = $state<Category[]>([]);
@@ -24,6 +26,8 @@
 
   // Modal Create/Edit
   let modalOpen = $state(false);
+  let scannerOpen = $state(false);
+  let lookupLoading = $state(false);
   let editId = $state<number | null>(null);
   let formCategoryId = $state<number | ''>('');
   let formName = $state('');
@@ -33,6 +37,8 @@
   let formSellPrice = $state<number>(0);
   let formStock = $state<number>(0);
   let formUnit = $state('pcs');
+  let formImageUrl = $state('');
+  let formBrand = $state('');
   let formLoading = $state(false);
 
   // Delete modal
@@ -80,6 +86,8 @@
     formSellPrice = 0;
     formStock = 10;
     formUnit = 'pcs';
+    formImageUrl = '';
+    formBrand = '';
     modalOpen = true;
   }
 
@@ -93,7 +101,32 @@
     formSellPrice = prd.sell_price;
     formStock = prd.stock;
     formUnit = prd.unit;
+    formImageUrl = prd.image_url || '';
+    formBrand = '';
     modalOpen = true;
+  }
+
+  async function handleBarcodeDetected(barcode: string) {
+    formBarcode = barcode;
+    if (!formSKU) {
+      formSKU = 'SKU-' + barcode;
+    }
+    lookupLoading = true;
+    toast.info('Mencari database produk untuk barcode: ' + barcode + '...');
+    try {
+      const res = await lookupBarcodeInfo(barcode);
+      if (res && res.name) {
+        formName = res.name;
+        if (res.unit) formUnit = res.unit;
+        if (res.imageUrl) formImageUrl = res.imageUrl;
+        if (res.brand) formBrand = res.brand;
+        toast.success(`Ditemukan: ${res.name} ${res.brand ? '(' + res.brand + ')' : ''}`);
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      lookupLoading = false;
+    }
   }
 
   function generateRandomBarcode() {
@@ -128,7 +161,7 @@
         sell_price: Number(formSellPrice),
         stock: Number(formStock),
         unit: formUnit,
-        image_url: ''
+        image_url: formImageUrl
       };
 
       if (editId) {
@@ -330,53 +363,108 @@
   maxWidth="max-w-xl"
   onclose={() => (modalOpen = false)}
 >
-  <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div class="sm:col-span-2">
-        <Input
-          label="Nama Barang / Produk"
-          placeholder="Contoh: Indomie Goreng Spesial 85g"
-          bind:value={formName}
-          required
-        />
-      </div>
-
+  <div class="space-y-4">
+    <!-- Camera Scan Quick Banner -->
+    <div class="p-3 bg-[#FFE600] text-black border-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-[2px_2px_0px_0px_#000000]">
       <div>
-        <label for="form-category" class="text-xs font-black uppercase tracking-wider block mb-1.5">
-          Kategori <span class="text-red-500">*</span>
-        </label>
-        <select
-          id="form-category"
-          bind:value={formCategoryId}
-          class="neo-input font-bold text-sm bg-white dark:bg-[#222]"
-          required
-        >
-          {#each categories as cat}
-            <option value={cat.id}>{cat.name}</option>
-          {/each}
-        </select>
+        <span class="text-xs font-black uppercase tracking-wider block">Scan Barcode Otomatis</span>
+        <p class="text-[11px] font-bold text-neutral-800">Foto / scan barcode kemasan di HP untuk mengisi nama barang & foto otomatis</p>
       </div>
+      <button
+        type="button"
+        onclick={() => (scannerOpen = true)}
+        class="neo-btn bg-black text-white px-3.5 py-1.5 text-xs font-black self-start sm:self-auto"
+      >
+        📷 Scan Kamera HP
+      </button>
+    </div>
 
-      <div>
-        <label for="form-unit" class="text-xs font-black uppercase tracking-wider block mb-1.5">Satuan</label>
-        <select
-          id="form-unit"
-          bind:value={formUnit}
-          class="neo-input font-bold text-sm bg-white dark:bg-[#222]"
-        >
-          {#each units as u}
-            <option value={u}>{u}</option>
-          {/each}
-        </select>
+    {#if lookupLoading}
+      <div class="p-2 bg-blue-100 border-2 border-blue-500 text-blue-800 text-xs font-bold flex items-center gap-2">
+        <div class="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent animate-spin rounded-full"></div>
+        Mencari data produk di database internasional (Open Food Facts)...
       </div>
+    {/if}
 
-      <div>
-        <Input
-          label="Barcode (EAN-13 / UPC)"
-          placeholder="Scan atau ketik barcode..."
-          bind:value={formBarcode}
-        />
-      </div>
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {#if formImageUrl}
+          <div class="sm:col-span-2 flex items-center gap-3 p-2 bg-neutral-100 dark:bg-[#252525] border-2 border-black">
+            <img src={formImageUrl} alt="Preview Produk" class="w-16 h-16 object-contain bg-white border border-neutral-300" />
+            <div class="text-xs">
+              <span class="font-black text-[#00E676] block">✓ Informasi Produk Terdeteksi</span>
+              {#if formBrand}
+                <span class="text-neutral-700 dark:text-neutral-300 font-bold block">Produsen / Merek: {formBrand}</span>
+              {/if}
+              <button
+                type="button"
+                onclick={() => { formImageUrl = ''; formBrand = ''; }}
+                class="text-[10px] text-red-500 underline font-bold mt-1"
+              >
+                Hapus Foto
+              </button>
+            </div>
+          </div>
+        {/if}
+
+        <div class="sm:col-span-2">
+          <Input
+            label="Nama Barang / Produk"
+            placeholder="Contoh: Indomie Goreng Spesial 85g"
+            bind:value={formName}
+            required
+          />
+        </div>
+
+        <div>
+          <label for="form-category" class="text-xs font-black uppercase tracking-wider block mb-1.5">
+            Kategori <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="form-category"
+            bind:value={formCategoryId}
+            class="neo-input font-bold text-sm bg-white dark:bg-[#222]"
+            required
+          >
+            {#each categories as cat}
+              <option value={cat.id}>{cat.name}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div>
+          <label for="form-unit" class="text-xs font-black uppercase tracking-wider block mb-1.5">Satuan</label>
+          <select
+            id="form-unit"
+            bind:value={formUnit}
+            class="neo-input font-bold text-sm bg-white dark:bg-[#222]"
+          >
+            {#each units as u}
+              <option value={u}>{u}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div>
+          <div class="flex gap-1.5 items-end">
+            <div class="flex-1">
+              <Input
+                label="Barcode (EAN-13 / UPC)"
+                placeholder="Scan atau ketik barcode..."
+                bind:value={formBarcode}
+                onchange={() => { if (formBarcode) handleBarcodeDetected(formBarcode); }}
+              />
+            </div>
+            <button
+              type="button"
+              onclick={() => (scannerOpen = true)}
+              title="Buka Kamera Barcode"
+              class="neo-btn bg-[#00F0FF] text-black px-3 py-2.5 mb-0.5 border-2 text-sm"
+            >
+              📷
+            </button>
+          </div>
+        </div>
 
       <div>
         <div class="flex items-center justify-between mb-1.5">
@@ -445,6 +533,7 @@
       <Button variant="primary" type="submit" loading={formLoading}>Simpan Produk</Button>
     </div>
   </form>
+  </div>
 </Modal>
 
 <!-- Modal Delete -->
@@ -460,3 +549,10 @@
     <Button variant="danger" onclick={handleDelete}>Hapus</Button>
   </div>
 </Modal>
+
+<!-- Barcode Camera Scanner Modal -->
+<BarcodeScannerModal
+  open={scannerOpen}
+  onclose={() => (scannerOpen = false)}
+  onscan={handleBarcodeDetected}
+/>

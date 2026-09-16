@@ -1,0 +1,21 @@
+# Dependencies & build output
+node_modules
+.svelte-kit
+build
+dist
+*.exe
+server
+
+# Environment & secrets
+.env
+*.local
+
+# Tunnel logs & binaries
+*.deb
+*.log
+cloudflared.exe
+cloudflared
+
+# OS files
+.DS_Store
+Thumbs.db

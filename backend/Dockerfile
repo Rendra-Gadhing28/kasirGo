@@ -21,12 +21,14 @@ WORKDIR /app
 
 RUN apk add --no-cache ca-certificates tzdata
 ENV TZ=Asia/Jakarta
+ENV PORT=7860
 
 COPY --from=builder /app/server /app/server
 
-# Uploads directory
-RUN mkdir -p /app/uploads
+# Uploads directory with full permissions for container runners
+RUN mkdir -p /app/uploads && chmod 777 /app/uploads
 
+EXPOSE 7860
 EXPOSE 8080
 
 ENTRYPOINT ["/app/server"]

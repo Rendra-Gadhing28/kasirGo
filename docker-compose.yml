@@ -28,7 +28,7 @@ services:
       APP_NAME: KasirPro
       APP_ENV: production
       PORT: 8080
-      APP_URL: http://localhost:8080
+      APP_URL: https://packing-cigarettes-clerk-sam.trycloudflare.com
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
@@ -40,7 +40,7 @@ services:
       MIDTRANS_SERVER_KEY: SB-Mid-server-simulator-mock-key-12345
       MIDTRANS_CLIENT_KEY: SB-Mid-client-simulator-mock-key-12345
       MIDTRANS_IS_PRODUCTION: "false"
-      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:80,http://localhost:3000,http://localhost:5173"
+      CORS_ALLOWED_ORIGINS: "*"
     ports:
       - "8080:8080"
     volumes:

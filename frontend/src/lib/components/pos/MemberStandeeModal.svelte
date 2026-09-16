@@ -17,7 +17,10 @@
 
   $effect(() => {
     if (typeof window !== 'undefined') {
-      registerUrl = `${window.location.origin}/join-member/${outletCode}`;
+      const origin = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'https://fish-warming-logos-lots.trycloudflare.com'
+        : window.location.origin;
+      registerUrl = `${origin}/join-member/${outletCode}`;
     }
   });
 

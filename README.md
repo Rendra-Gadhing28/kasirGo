@@ -79,7 +79,7 @@ Tampilan antarmuka mengusung gaya estetika **Neo-Brutalism UI** (border tebal so
 - **Pendaftaran Member Mandiri oleh Pelanggan (QR Meja Kasir)**:
   - Tersedia tombol **"📱 CETAK QR MEMBER"** di halaman POS dan Pelanggan.
   - Owner/Kasir mencetak standee QR dan menempelkannya di meja kasir.
-  - Pembeli memindai QR via kamera HP, membuka tautan publik `http://localhost/join-member/KASIR-DEMO-001`.
+  - Pembeli memindai QR via kamera HP, membuka tautan publik `https://fish-warming-logos-lots.trycloudflare.com/join-member/KASIR-DEMO-001`.
   - Pembeli mengisi nama dan no. WhatsApp, instan mendapatkan **10 Poin Bonus** dan kartu member digital dengan Barcode nomor HP yang siap di-scan kasir.
 
 ### Master Data Management
@@ -121,7 +121,7 @@ docker compose up -d --build
 ```
 
 Setelah kontainer berjalan:
-- **Aplikasi Kasir (Web)**: Buka browser di [http://localhost](http://localhost) (atau port `80`)
+- **Aplikasi Kasir (Web)**: Buka browser di [https://fish-warming-logos-lots.trycloudflare.com](https://fish-warming-logos-lots.trycloudflare.com) (atau [http://localhost](http://localhost))
 - **Backend API Direct**: [http://localhost:8080/api/v1/health](http://localhost:8080/api/v1/health)
 - **Database MySQL**: `localhost:3306` (Database: `kasirpro`, User: `root` / `kasirpro_app`)
 

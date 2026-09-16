@@ -23,7 +23,7 @@ func CORSMiddleware() fiber.Handler {
 	cfg := config.AppConfig
 	origins := cfg.CORSAllowedOrigins
 	if origins == "" {
-		origins = "http://localhost:5173,http://localhost:3000,http://localhost,https://*.vercel.app"
+		origins = "https://fish-warming-logos-lots.trycloudflare.com,http://localhost:5173,http://localhost:3000,http://localhost,https://*.vercel.app"
 	}
 
 	return cors.New(cors.Config{
@@ -38,8 +38,11 @@ func CORSMiddleware() fiber.Handler {
 				if trimmed == origin {
 					return true
 				}
-				// Support vercel subdomain matching
+				// Support vercel and cloudflare tunnel subdomain matching
 				if strings.Contains(trimmed, "vercel.app") && strings.HasSuffix(origin, ".vercel.app") {
+					return true
+				}
+				if strings.Contains(trimmed, "trycloudflare.com") && strings.HasSuffix(origin, ".trycloudflare.com") {
 					return true
 				}
 			}

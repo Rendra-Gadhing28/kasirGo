@@ -76,12 +76,14 @@ func InitDB() *gorm.DB {
 		// Parameterized queries are always enforced by GORM
 	})
 	if err != nil {
-		log.Fatalf("Gagal terhubung ke MySQL database: %v", err)
+		log.Printf("Gagal terhubung ke MySQL database: %v", err)
+		panic(fmt.Sprintf("Gagal terhubung ke MySQL database: %v", err))
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("Gagal mendapatkan database instance: %v", err)
+		log.Printf("Gagal mendapatkan database instance: %v", err)
+		panic(fmt.Sprintf("Gagal mendapatkan database instance: %v", err))
 	}
 
 	// Connection Pool settings for high performance and stability

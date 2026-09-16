@@ -36,15 +36,15 @@
 
 <Toast />
 
-{#if $auth.loading}
+{#if isPublicStandalone}
+  <main class="min-h-screen">
+    {@render children()}
+  </main>
+{:else if $auth.loading}
   <div class="min-h-screen flex flex-col items-center justify-center bg-[#FFFDF7] dark:bg-[#121212] gap-4">
     <div class="w-12 h-12 border-4 border-black dark:border-white border-t-[#FFE600] animate-spin"></div>
     <p class="font-black text-sm uppercase tracking-widest">Memuat KasirPro...</p>
   </div>
-{:else if isPublicStandalone}
-  <main class="min-h-screen">
-    {@render children()}
-  </main>
 {:else}
   <div class="flex h-screen overflow-hidden bg-[#FFFDF7] dark:bg-[#121212]">
     <!-- Left Navigation -->

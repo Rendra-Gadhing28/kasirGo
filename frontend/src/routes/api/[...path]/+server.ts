@@ -1,14 +1,16 @@
 import type { RequestHandler } from './$types';
 
-const BACKEND_INTERNAL_URL = process.env.BACKEND_URL || 'http://backend:8080';
-const BACKEND_LOCAL_URL = 'http://localhost:8080';
+const DEFAULT_HOST_URL = 'https://kasir-go-be.vercel.app';
+const BACKEND_INTERNAL_URL = process.env.BACKEND_URL || (process.env.VERCEL ? DEFAULT_HOST_URL : 'http://backend:8080');
+const BACKEND_LOCAL_URL = process.env.BACKEND_URL || DEFAULT_HOST_URL;
 
 async function proxyRequest(event: Parameters<RequestHandler>[0]) {
   const { request, params, url } = event;
   
   // Decide backend URL: use BACKEND_URL if set, otherwise fallback depending on env
   const baseBackend = process.env.BACKEND_URL || (process.env.NODE_ENV === 'production' ? BACKEND_INTERNAL_URL : BACKEND_LOCAL_URL);
-  const targetUrl = `${baseBackend}/api/${params.path}${url.search}`;
+  const cleanBase = baseBackend.replace(/\/+$/, '');
+  const targetUrl = `${cleanBase}/api/${params.path}${url.search}`;
 
   const headers = new Headers(request.headers);
   // Remove host header to let fetch set target host
