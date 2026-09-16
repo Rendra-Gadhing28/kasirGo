@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -43,6 +44,12 @@ func parseDatabaseURL(rawURL string) string {
 func InitDB() (*gorm.DB, error) {
 	cfg := config.AppConfig
 
+	// In serverless (Vercel), fail immediately if DB_HOST is not configured instead of hanging on 127.0.0.1
+	isVercel := os.Getenv("VERCEL") != ""
+	if isVercel && cfg.DatabaseURL == "" && (cfg.DBHost == "127.0.0.1" || cfg.DBHost == "localhost" || cfg.DBHost == "") {
+		return nil, fmt.Errorf("DB_HOST belum disetel di Vercel Environment Variables. Masukkan DB_HOST dari TiDB Cloud di Project Settings > Environment Variables")
+	}
+
 	var dsn string
 	if cfg.DatabaseURL != "" {
 		dsn = parseDatabaseURL(cfg.DatabaseURL)
@@ -56,7 +63,7 @@ func InitDB() (*gorm.DB, error) {
 			}
 		}
 
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=10s%s",
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=3s%s",
 			cfg.DBUser,
 			cfg.DBPassword,
 			cfg.DBHost,
@@ -85,8 +92,8 @@ func InitDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("gagal sqlDB: %w", err)
 	}
 
-	sqlDB.SetMaxIdleConns(5)
-	sqlDB.SetMaxOpenConns(50)
+	sqlDB.SetMaxIdleConns(2)
+	sqlDB.SetMaxOpenConns(20)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Println("Koneksi MySQL database berhasil diinisialisasi.")
