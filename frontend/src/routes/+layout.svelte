@@ -37,16 +37,16 @@
 <Toast />
 
 {#if isPublicStandalone}
-  <main class="min-h-screen">
+  <main class="min-h-screen bg-[#FFFDF7] dark:bg-[#121212] text-black dark:text-white transition-colors duration-150">
     {@render children()}
   </main>
 {:else if $auth.loading}
-  <div class="min-h-screen flex flex-col items-center justify-center bg-[#FFFDF7] dark:bg-[#121212] gap-4">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-[#FFFDF7] dark:bg-[#121212] text-black dark:text-white gap-4 transition-colors duration-150">
     <div class="w-12 h-12 border-4 border-black dark:border-white border-t-[#FFE600] animate-spin"></div>
-    <p class="font-black text-sm uppercase tracking-widest">Memuat KasirPro...</p>
+    <p class="font-black text-sm uppercase tracking-widest text-black dark:text-white">Memuat KasirPro...</p>
   </div>
 {:else}
-  <div class="flex h-screen overflow-hidden bg-[#FFFDF7] dark:bg-[#121212]">
+  <div class="flex h-screen overflow-hidden bg-[#FFFDF7] dark:bg-[#121212] text-black dark:text-white transition-colors duration-150">
     <!-- Left Navigation -->
     <Sidebar
       mobileOpen={mobileSidebarOpen}
@@ -54,9 +54,9 @@
     />
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#FFFDF7] dark:bg-[#121212] transition-colors duration-150">
       <Navbar ontogglemobile={() => (mobileSidebarOpen = !mobileSidebarOpen)} />
-      <main class="flex-1 overflow-y-auto p-4 md:p-6">
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#FFFDF7] dark:bg-[#121212] text-black dark:text-white transition-colors duration-150">
         {@render children()}
       </main>
     </div>

@@ -51,12 +51,16 @@
     <!-- Dark/Light Theme Toggle -->
     <button
       onclick={() => theme.toggle()}
-      class="neo-btn bg-white dark:bg-[#222] text-black dark:text-white p-2 border-2 text-sm"
+      class="neo-btn bg-white dark:bg-[#222] text-black dark:text-white px-2.5 py-1.5 border-2 text-sm flex items-center gap-1.5 font-black"
       title="Ubah Mode Gelap / Terang"
       aria-label="Ubah tema warna"
     >
       <span class="dark:hidden font-bold">🌙</span>
       <span class="hidden dark:inline font-bold">☀️</span>
+      <span class="text-xs uppercase hidden sm:inline">
+        <span class="dark:hidden">Gelap</span>
+        <span class="hidden dark:inline">Terang</span>
+      </span>
     </button>
   </div>
 </header>

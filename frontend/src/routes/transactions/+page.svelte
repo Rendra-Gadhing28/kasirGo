@@ -147,7 +147,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-[#FFE600] text-black border-b-3 border-black font-black text-xs uppercase tracking-wider">
+          <tr class="bg-[#FFE600] text-black border-b-3 border-black dark:border-white font-black text-xs uppercase tracking-wider">
             <th class="p-3.5">No Faktur</th>
             <th class="p-3.5">Waktu</th>
             <th class="p-3.5">Kasir</th>
@@ -158,7 +158,7 @@
             <th class="p-3.5 text-center w-36">Aksi</th>
           </tr>
         </thead>
-        <tbody class="divide-y-2 divide-black dark:divide-neutral-700 text-sm font-bold">
+        <tbody class="divide-y-2 divide-black dark:divide-neutral-700 text-sm font-bold text-black dark:text-white">
           {#if loading}
             <tr><td colspan="8" class="p-8 text-center text-neutral-500 font-bold">Memuat transaksi...</td></tr>
           {:else if transactions.length === 0}

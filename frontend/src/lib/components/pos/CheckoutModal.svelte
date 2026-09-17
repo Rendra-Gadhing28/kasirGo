@@ -207,21 +207,21 @@
           <button
             type="button"
             onclick={() => (paymentMethod = 'cash')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'cash' ? 'bg-[#00F0FF] text-black' : 'bg-white dark:bg-[#222]'}"
+            class="neo-btn py-3 text-xs font-black {paymentMethod === 'cash' ? 'bg-[#00F0FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
             💵 TUNAI (CASH)
           </button>
           <button
             type="button"
             onclick={() => (paymentMethod = 'qris')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'qris' ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222]'}"
+            class="neo-btn py-3 text-xs font-black {paymentMethod === 'qris' ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
             📱 QRIS MIDTRANS
           </button>
           <button
             type="button"
             onclick={() => (paymentMethod = 'transfer')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'transfer' ? 'bg-[#B388FF] text-black' : 'bg-white dark:bg-[#222]'}"
+            class="neo-btn py-3 text-xs font-black {paymentMethod === 'transfer' ? 'bg-[#B388FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
             🏦 TRANSFER BANK
           </button>
@@ -243,35 +243,35 @@
             <button
               type="button"
               onclick={() => setQuickCash($cartTotals.total)}
-              class="neo-btn bg-white dark:bg-[#333] px-2.5 py-1 text-xs font-black"
+              class="neo-btn bg-white dark:bg-[#333] text-black dark:text-white px-2.5 py-1 text-xs font-black"
             >
               Uang Pas
             </button>
             <button
               type="button"
               onclick={() => setQuickCash(20000)}
-              class="neo-btn bg-white dark:bg-[#333] px-2.5 py-1 text-xs font-black"
+              class="neo-btn bg-white dark:bg-[#333] text-black dark:text-white px-2.5 py-1 text-xs font-black"
             >
               Rp 20.000
             </button>
             <button
               type="button"
               onclick={() => setQuickCash(50000)}
-              class="neo-btn bg-white dark:bg-[#333] px-2.5 py-1 text-xs font-black"
+              class="neo-btn bg-white dark:bg-[#333] text-black dark:text-white px-2.5 py-1 text-xs font-black"
             >
               Rp 50.000
             </button>
             <button
               type="button"
               onclick={() => setQuickCash(100000)}
-              class="neo-btn bg-white dark:bg-[#333] px-2.5 py-1 text-xs font-black"
+              class="neo-btn bg-white dark:bg-[#333] text-black dark:text-white px-2.5 py-1 text-xs font-black"
             >
               Rp 100.000
             </button>
             <button
               type="button"
               onclick={() => setQuickCash(200000)}
-              class="neo-btn bg-white dark:bg-[#333] px-2.5 py-1 text-xs font-black"
+              class="neo-btn bg-white dark:bg-[#333] text-black dark:text-white px-2.5 py-1 text-xs font-black"
             >
               Rp 200.000
             </button>

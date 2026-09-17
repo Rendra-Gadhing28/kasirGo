@@ -59,8 +59,8 @@
           href={item.href}
           onclick={onclose}
           class="flex items-center gap-3 px-3.5 py-2.5 font-black text-sm border-2 transition-all {isActive
-            ? 'bg-[#00F0FF] text-black border-black shadow-[3px_3px_0px_0px_#000000] dark:shadow-[3px_3px_0px_0px_#ffffff] translate-x-1'
-            : 'border-transparent text-neutral-700 dark:text-neutral-300 hover:border-black dark:hover:border-white hover:bg-neutral-100 dark:hover:bg-neutral-800'}"
+            ? 'bg-[#00F0FF] text-black border-black dark:border-white shadow-[3px_3px_0px_0px_#000000] dark:shadow-[3px_3px_0px_0px_#ffffff] translate-x-1'
+            : 'border-transparent text-neutral-800 dark:text-neutral-200 hover:border-black dark:hover:border-white hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-black dark:hover:text-white'}"
         >
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d={item.icon} />
@@ -76,12 +76,12 @@
     {#if $auth.user}
       <div class="mb-3">
         <div class="flex items-center justify-between gap-1">
-          <p class="text-sm font-black truncate max-w-[130px]">{$auth.user.name}</p>
+          <p class="text-sm font-black truncate max-w-[130px] text-black dark:text-white">{$auth.user.name}</p>
           <Badge variant={$auth.user.role === 'owner' ? 'yellow' : $auth.user.role === 'admin' ? 'purple' : 'cyan'}>
             {$auth.user.role}
           </Badge>
         </div>
-        <p class="text-xs text-neutral-500 font-bold truncate">{$auth.user.email}</p>
+        <p class="text-xs text-neutral-500 dark:text-neutral-400 font-bold truncate">{$auth.user.email}</p>
       </div>
     {/if}
 

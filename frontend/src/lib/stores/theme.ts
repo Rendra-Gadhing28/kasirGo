@@ -13,8 +13,10 @@ function createThemeStore() {
         isDark.set(activeDark);
         if (activeDark) {
           document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
         } else {
           document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
         }
       }
     },
@@ -25,8 +27,10 @@ function createThemeStore() {
           localStorage.setItem('kasirpro_theme', next ? 'dark' : 'light');
           if (next) {
             document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
           } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
           }
         }
         return next;

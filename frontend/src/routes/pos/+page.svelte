@@ -169,14 +169,14 @@
       <div class="flex gap-2 overflow-x-auto pb-2 mb-3 no-scrollbar flex-shrink-0">
         <button
           onclick={() => (selectedCategory = null)}
-          class="neo-btn text-xs px-3 py-1.5 whitespace-nowrap {selectedCategory === null ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white dark:bg-[#222]'}"
+          class="neo-btn text-xs px-3 py-1.5 whitespace-nowrap {selectedCategory === null ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
         >
           Semua ({products.length})
         </button>
         {#each categories as cat}
           <button
             onclick={() => (selectedCategory = cat.id)}
-            class="neo-btn text-xs px-3 py-1.5 whitespace-nowrap {selectedCategory === cat.id ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222]'}"
+            class="neo-btn text-xs px-3 py-1.5 whitespace-nowrap {selectedCategory === cat.id ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
             {cat.name}
           </button>
@@ -318,7 +318,7 @@
                 <div class="flex items-center gap-2">
                   <button
                     onclick={() => openItemDiscount(item.product.id, item.discount_type, item.discount_value)}
-                    class="text-[11px] font-black underline {item.discount_value > 0 ? 'text-[#00E676]' : 'text-neutral-500 hover:text-black'}"
+                    class="text-[11px] font-black underline {item.discount_value > 0 ? 'text-[#00E676] dark:text-[#33eb91]' : 'text-neutral-500 hover:text-black dark:hover:text-white'}"
                   >
                     {item.discount_value > 0 ? `Diskon (${item.discount_value}${item.discount_type === 'percentage' ? '%' : 'rb'})` : 'Beri Diskon'}
                   </button>

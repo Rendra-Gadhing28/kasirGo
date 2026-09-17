@@ -131,7 +131,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-[#FFE600] text-black border-b-3 border-black font-black text-xs uppercase tracking-wider">
+          <tr class="bg-[#FFE600] text-black border-b-3 border-black dark:border-white font-black text-xs uppercase tracking-wider">
             <th class="p-3.5">Nama Perusahaan / Supplier</th>
             <th class="p-3.5">PIC / Sales</th>
             <th class="p-3.5">Telepon</th>
@@ -140,7 +140,7 @@
             <th class="p-3.5 text-center w-28">Aksi</th>
           </tr>
         </thead>
-        <tbody class="divide-y-2 divide-black dark:divide-neutral-700 text-sm font-bold">
+        <tbody class="divide-y-2 divide-black dark:divide-neutral-700 text-sm font-bold text-black dark:text-white">
           {#if loading}
             <tr><td colspan="6" class="p-8 text-center text-neutral-500 font-bold">Memuat supplier...</td></tr>
           {:else if suppliers.length === 0}
