@@ -12,6 +12,7 @@
   import CheckoutModal from '$lib/components/pos/CheckoutModal.svelte';
   import ThermalReceipt from '$lib/components/pos/ThermalReceipt.svelte';
   import MemberStandeeModal from '$lib/components/pos/MemberStandeeModal.svelte';
+  import BarcodeScannerModal from '$lib/components/pos/BarcodeScannerModal.svelte';
 
   let products = $state<Product[]>([]);
   let categories = $state<Category[]>([]);
@@ -19,6 +20,7 @@
   let loading = $state(true);
 
   let standeeOpen = $state(false);
+  let itemScannerOpen = $state(false);
 
   // Filters
   let search = $state('');
@@ -70,21 +72,34 @@
     })
   );
 
+  function handleScannedProduct(barcode: string) {
+    const term = barcode.trim();
+    if (!term) return;
+
+    // Search by exact barcode, numeric barcode, or SKU
+    const found = products.find(
+      (p) =>
+        p.barcode === term ||
+        p.barcode.replace(/[^0-9A-Za-z]/g, '') === term.replace(/[^0-9A-Za-z]/g, '') ||
+        p.sku.toLowerCase() === term.toLowerCase()
+    );
+
+    if (found) {
+      if (found.stock > 0) {
+        cart.addItem(found);
+        toast.success(`+ ${found.name} (${formatRupiah(found.sell_price)})`);
+      } else {
+        toast.error(`Stok "${found.name}" habis!`);
+      }
+    } else {
+      toast.error(`Barang barcode "${term}" tidak ditemukan di katalog toko.`);
+    }
+  }
+
   function handleBarcodeSearch(e: KeyboardEvent) {
     if (e.key === 'Enter' && search.trim()) {
-      // Find exact barcode match
-      const exactMatch = products.find(
-        (p) => p.barcode === search.trim() || p.sku.toLowerCase() === search.trim().toLowerCase()
-      );
-      if (exactMatch) {
-        if (exactMatch.stock > 0) {
-          cart.addItem(exactMatch);
-          toast.success(`+ ${exactMatch.name}`);
-          search = '';
-        } else {
-          toast.error(`Stok ${exactMatch.name} habis!`);
-        }
-      }
+      handleScannedProduct(search);
+      search = '';
     }
   }
 
@@ -145,10 +160,10 @@
     <!-- LEFT COLUMN: Product Catalog (7 cols) -->
     <div class="lg:col-span-7 flex flex-col min-h-0 {mobileTab === 'cart' ? 'hidden lg:flex' : 'flex'}">
       <!-- Search and Scan Bar -->
-      <div class="mb-3 flex gap-2">
-        <div class="relative flex-1">
+      <div class="mb-3 flex flex-wrap sm:flex-nowrap gap-2">
+        <div class="relative flex-1 min-w-[200px]">
           <Input
-            placeholder="Scan barcode / cari nama produk..."
+            placeholder="Scan barcode / ketik nama produk..."
             bind:value={search}
             onkeydown={handleBarcodeSearch}
             class="text-sm font-bold pl-9"
@@ -160,6 +175,14 @@
         {#if search}
           <Button variant="outline" size="sm" onclick={() => (search = '')}>Reset</Button>
         {/if}
+        <button
+          type="button"
+          onclick={() => (itemScannerOpen = true)}
+          class="neo-btn bg-[#00F0FF] text-black px-3.5 py-2 text-xs font-black flex items-center gap-1.5 whitespace-nowrap shadow-[3px_3px_0px_0px_#000000]"
+          title="Buka Kamera Barcode Scanner untuk memasukkan barang belanjaan"
+        >
+          <span>📷</span> <span>SCAN BARANG</span>
+        </button>
         <Button variant="accent" size="sm" onclick={() => (standeeOpen = true)}>
           📱 QR Member
         </Button>
@@ -446,4 +469,13 @@
 <MemberStandeeModal
   open={standeeOpen}
   onclose={() => (standeeOpen = false)}
+/>
+
+<!-- Continuous Item Barcode Scanner Modal for Cart -->
+<BarcodeScannerModal
+  open={itemScannerOpen}
+  title="SCAN BARANG KE KERANJANG (KAMERA)"
+  continuous={true}
+  onclose={() => (itemScannerOpen = false)}
+  onscan={handleScannedProduct}
 />

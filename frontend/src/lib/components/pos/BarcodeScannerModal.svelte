@@ -6,17 +6,50 @@
 
   interface Props {
     open: boolean;
+    title?: string;
+    continuous?: boolean;
     onclose: () => void;
     onscan: (barcode: string) => void;
   }
 
-  let { open, onclose, onscan }: Props = $props();
+  let {
+    open,
+    title = 'SCAN BARCODE PRODUK',
+    continuous = false,
+    onclose,
+    onscan
+  }: Props = $props();
 
   let scannerContainerId = 'barcode-reader-box';
   let html5QrCode: Html5Qrcode | null = null;
   let isScanning = $state(false);
   let scanError = $state('');
   let fileInput: HTMLInputElement | null = null;
+
+  let lastScanned = $state('');
+  let lastScanTime = $state(0);
+  let totalScanned = $state(0);
+
+  function playBeepSound() {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1800, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } catch (_) {}
+  }
 
   async function startScanner() {
     scanError = '';
@@ -45,7 +78,7 @@
         (decodedText) => {
           handleSuccess(decodedText);
         },
-        (errorMessage) => {
+        () => {
           // ignore frame read errors while scanning
         }
       );
@@ -69,14 +102,32 @@
   }
 
   function handleSuccess(barcode: string) {
+    const clean = barcode.trim();
+    if (!clean) return;
+
+    const now = Date.now();
+    // Debounce duplicate scans within 1.5 seconds in continuous mode
+    if (continuous && clean === lastScanned && now - lastScanTime < 1500) {
+      return;
+    }
+
+    lastScanned = clean;
+    lastScanTime = now;
+    totalScanned++;
+
+    playBeepSound();
     if ('vibrate' in navigator) {
       try {
         navigator.vibrate(100);
-      } catch (e) {}
+      } catch (_) {}
     }
-    stopScanner();
-    onscan(barcode);
-    onclose();
+
+    onscan(clean);
+
+    if (!continuous) {
+      stopScanner();
+      onclose();
+    }
   }
 
   async function handleFileScan(e: Event) {
@@ -97,7 +148,8 @@
 
   $effect(() => {
     if (open) {
-      // Small timeout to allow DOM modal to render the scannerContainerId element
+      totalScanned = 0;
+      lastScanned = '';
       setTimeout(() => {
         startScanner();
       }, 200);
@@ -113,17 +165,25 @@
 
 <Modal
   {open}
-  title="SCAN BARCODE PRODUK (KAMERA HP)"
+  {title}
   maxWidth="max-w-md"
-  onclose={() => { stopScanner(); onclose(); }}
+  onclose={() => {
+    stopScanner();
+    onclose();
+  }}
 >
-  <div class="space-y-4 text-center">
-    <p class="text-xs text-neutral-600 dark:text-neutral-300 font-bold">
-      Arahkan kamera ke garis barcode produk (EAN-13 / UPC / QR).
-    </p>
+  <div class="space-y-3.5 text-center">
+    <div class="flex items-center justify-between text-xs font-bold text-neutral-600 dark:text-neutral-300">
+      <span>Arahkan kamera ke barcode produk atau QR</span>
+      {#if continuous && totalScanned > 0}
+        <span class="bg-[#00E676] text-black px-2 py-0.5 border border-black font-black text-[11px]">
+          {totalScanned}x Terscan
+        </span>
+      {/if}
+    </div>
 
     <!-- Scanner Viewport -->
-    <div class="relative overflow-hidden bg-black border-3 border-black shadow-[4px_4px_0px_0px_#000000] min-h-[220px] rounded-sm flex items-center justify-center">
+    <div class="relative overflow-hidden bg-black border-3 border-black dark:border-white shadow-[4px_4px_0px_0px_#000000] dark:shadow-[4px_4px_0px_0px_#ffffff] min-h-[220px] rounded-sm flex items-center justify-center">
       <div id={scannerContainerId} class="w-full h-full min-h-[220px]"></div>
 
       {#if !isScanning && !scanError}
@@ -131,7 +191,20 @@
           Menyiapkan kamera...
         </div>
       {/if}
+
+      <!-- Laser Guide Line -->
+      {#if isScanning}
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500 shadow-[0_0_8px_2px_#ef4444] pointer-events-none opacity-80"></div>
+      {/if}
     </div>
+
+    <!-- Last Scanned Indicator in Continuous Mode -->
+    {#if continuous && lastScanned}
+      <div class="p-2 bg-[#FFE600] text-black border-2 border-black font-black text-xs flex items-center justify-between shadow-[2px_2px_0px_0px_#000000]">
+        <span>Terscan:</span>
+        <span class="font-mono text-xs">{lastScanned}</span>
+      </div>
+    {/if}
 
     {#if scanError}
       <div class="p-3 bg-red-100 border-2 border-red-500 text-red-700 text-xs font-bold text-left">
@@ -139,7 +212,7 @@
       </div>
     {/if}
 
-    <!-- Alternative: Snap photo / Gallery option -->
+    <!-- Buttons -->
     <div class="pt-2 border-t-2 border-dashed border-neutral-300 dark:border-neutral-700 flex flex-col gap-2">
       <input
         type="file"
@@ -150,21 +223,30 @@
         onchange={handleFileScan}
       />
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid {continuous ? 'grid-cols-3' : 'grid-cols-2'} gap-2">
         <button
           type="button"
           onclick={() => fileInput?.click()}
-          class="neo-btn bg-[#00F0FF] text-black py-2.5 text-xs font-black"
+          class="neo-btn bg-[#00F0FF] text-black py-2 text-xs font-black"
         >
-          📷 Ambil Foto Barcode
+          📁 File / Foto
         </button>
         <button
           type="button"
           onclick={startScanner}
-          class="neo-btn bg-[#FFE600] text-black py-2.5 text-xs font-black"
+          class="neo-btn bg-[#FFE600] text-black py-2 text-xs font-black"
         >
-          🔄 Ulangi Kamera
+          🔄 Refresh
         </button>
+        {#if continuous}
+          <button
+            type="button"
+            onclick={() => { stopScanner(); onclose(); }}
+            class="neo-btn bg-[#00E676] text-black py-2 text-xs font-black"
+          >
+            ✓ Selesai
+          </button>
+        {/if}
       </div>
     </div>
   </div>

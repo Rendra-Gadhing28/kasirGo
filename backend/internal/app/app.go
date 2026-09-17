@@ -136,6 +136,7 @@ func SetupApp() *fiber.App {
 	protected.Delete("/products/:id", middleware.RequireRole("owner", "admin"), productHandler.Delete)
 
 	protected.Get("/customers", customerHandler.GetAll)
+	protected.Get("/customers/lookup/:code", customerHandler.LookupMember)
 	protected.Post("/customers", customerHandler.Create)
 	protected.Put("/customers/:id", middleware.RequireRole("owner", "admin"), customerHandler.Update)
 	protected.Delete("/customers/:id", middleware.RequireRole("owner", "admin"), customerHandler.Delete)

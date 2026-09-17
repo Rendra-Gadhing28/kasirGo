@@ -148,20 +148,6 @@ select.neo-input option {
   color: #ffffff;
 }
 
-/* Contrast Safety Net: Bright backgrounds must have black text, never white */
-:where([class*="bg-[#FFE600]"], [class*="bg-[#00F0FF]"], [class*="bg-[#00E676]"], [class*="bg-[#B388FF]"]) {
-  color: #000000;
-}
-
-:where([class*="bg-[#FFE600]"] *, [class*="bg-[#00F0FF]"] *, [class*="bg-[#00E676]"] *, [class*="bg-[#B388FF]"] *) {
-  color: #000000;
-}
-
-/* Danger / Dark accents must have white text */
-:where([class*="bg-[#FF5252]"]) {
-  color: #ffffff;
-}
-
 /* Struk Thermal Print Styling */
 @media print {
   body * {

@@ -7,6 +7,7 @@
   import Modal from '$lib/components/ui/Modal.svelte';
   import Button from '$lib/components/ui/Button.svelte';
   import Input from '$lib/components/ui/Input.svelte';
+  import BarcodeScannerModal from '$lib/components/pos/BarcodeScannerModal.svelte';
 
   interface Props {
     open: boolean;
@@ -21,6 +22,64 @@
   let cashPaid = $state<number>(0);
   let selectedCustomerId = $state<number | ''>('');
   let checkoutLoading = $state(false);
+
+  // Member search & scan
+  let memberSearchQuery = $state('');
+  let memberScannerOpen = $state(false);
+  let searchingMember = $state(false);
+
+  const selectedCustomer = $derived(
+    customers.find((c) => c.id === selectedCustomerId) || null
+  );
+
+  async function handleSearchMember(queryOverride?: string) {
+    const raw = (queryOverride !== undefined ? queryOverride : memberSearchQuery).trim();
+    if (!raw) return;
+    const q = raw.toLowerCase();
+
+    // 1. Search local list
+    const foundLocal = customers.find(
+      (c) =>
+        (c.member_code && c.member_code.toLowerCase() === q) ||
+        c.phone.toLowerCase() === q ||
+        c.phone.replace(/[^0-9]/g, '') === q.replace(/[^0-9]/g, '') ||
+        c.name.toLowerCase().includes(q)
+    );
+
+    if (foundLocal) {
+      selectedCustomerId = foundLocal.id;
+      memberSearchQuery = '';
+      toast.success(`Member terhubung: ${foundLocal.name} (${foundLocal.member_code || foundLocal.phone})`);
+      return;
+    }
+
+    // 2. Lookup from API
+    searchingMember = true;
+    try {
+      const res = await api.get<Customer>(`/customers/lookup/${encodeURIComponent(raw)}`);
+      if (res.data) {
+        const cust = res.data;
+        if (!customers.some((c) => c.id === cust.id)) {
+          customers.push(cust);
+        }
+        selectedCustomerId = cust.id;
+        memberSearchQuery = '';
+        toast.success(`Member terhubung: ${cust.name} (${cust.member_code || cust.phone})`);
+        return;
+      }
+    } catch {
+      // not found in backend
+    } finally {
+      searchingMember = false;
+    }
+
+    toast.error(`Member dengan no kartu / HP "${raw}" tidak ditemukan.`);
+  }
+
+  function clearMember() {
+    selectedCustomerId = '';
+    memberSearchQuery = '';
+  }
 
   // QRIS Simulation state
   let qrisStep = $state<'prepare' | 'waiting' | 'success'>('prepare');
@@ -176,26 +235,91 @@
         </div>
       </div>
 
-      <!-- Customer Selection -->
-      <div>
-        <label for="checkout-cust" class="text-xs font-black uppercase tracking-wider block mb-1.5">
-          Pilih Pelanggan / Member (Opsional)
-        </label>
-        <select
-          id="checkout-cust"
-          bind:value={selectedCustomerId}
-          class="neo-input font-bold text-sm bg-white dark:bg-[#222]"
-        >
-          <option value="">Pelanggan Umum (Walk-in / Tanpa Member)</option>
-          {#each customers as cust}
-            <option value={cust.id}>
-              {cust.name} ({cust.phone || '-'}) — Poin: {cust.points}
-            </option>
-          {/each}
-        </select>
-        {#if selectedCustomerId}
-          <div class="mt-1 text-xs text-[#00E676] font-black">
-            + Pelanggan akan mendapatkan {estimatedPoints} poin loyalitas dari transaksi ini.
+      <!-- Customer / Member Card Selection -->
+      <div class="p-3 bg-neutral-50 dark:bg-[#202020] border-2 border-black dark:border-white space-y-2">
+        <div class="flex items-center justify-between">
+          <label for="member-query" class="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-black dark:text-white">
+            <span>💳</span> Member Toko (Poin Belanja)
+          </label>
+          {#if selectedCustomer}
+            <button
+              type="button"
+              onclick={clearMember}
+              class="text-[11px] font-black underline text-red-600 dark:text-red-400 hover:opacity-80"
+            >
+              × Lepas Member
+            </button>
+          {/if}
+        </div>
+
+        {#if selectedCustomer}
+          <!-- Connected Member Banner -->
+          <div class="p-2.5 bg-[#00E676]/15 dark:bg-[#00E676]/10 border-2 border-[#00E676] flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-black text-sm text-black dark:text-white">{selectedCustomer.name}</span>
+                <span class="bg-black text-white px-1.5 py-0.5 text-[10px] font-mono font-black border border-black">
+                  {selectedCustomer.member_code || ('MBR-' + String(selectedCustomer.id).padStart(4, '0'))}
+                </span>
+              </div>
+              <div class="text-xs text-neutral-500 font-mono mt-0.5">{selectedCustomer.phone || '-'}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-bold text-neutral-600 dark:text-neutral-400">Saldo: {selectedCustomer.points} Poin</div>
+              <div class="text-xs font-black text-green-600 dark:text-[#33eb91]">+{estimatedPoints} Poin Belanja</div>
+            </div>
+          </div>
+        {:else}
+          <!-- Search / Scan Input Row -->
+          <div class="flex gap-1.5">
+            <div class="flex-1">
+              <input
+                id="member-query"
+                type="text"
+                bind:value={memberSearchQuery}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearchMember();
+                  }
+                }}
+                placeholder="Scan / Ketik No. Kartu Member (MBR-...) atau No. HP..."
+                class="neo-input text-xs font-bold py-2 bg-white dark:bg-[#252525] text-black dark:text-white"
+              />
+            </div>
+            <button
+              type="button"
+              onclick={() => handleSearchMember()}
+              disabled={searchingMember}
+              class="neo-btn bg-[#FFE600] text-black px-3 text-xs font-black"
+              title="Cari Member"
+            >
+              CARI
+            </button>
+            <button
+              type="button"
+              onclick={() => (memberScannerOpen = true)}
+              class="neo-btn bg-[#00F0FF] text-black px-3 text-xs font-black flex items-center gap-1"
+              title="Scan QR Member dari HP Pelanggan"
+            >
+              📷 <span>SCAN</span>
+            </button>
+          </div>
+
+          <!-- Dropdown Fallback -->
+          <div class="pt-0.5">
+            <select
+              id="checkout-cust"
+              bind:value={selectedCustomerId}
+              class="neo-input font-bold text-xs py-1.5 bg-white dark:bg-[#222] text-black dark:text-white"
+            >
+              <option value="">-- Atau Pilih Manual dari Daftar ({customers.length} Member) --</option>
+              {#each customers as cust}
+                <option value={cust.id}>
+                  {cust.member_code || ('MBR-' + String(cust.id).padStart(4, '0'))} - {cust.name} ({cust.phone || '-'}) — {cust.points} Poin
+                </option>
+              {/each}
+            </select>
           </div>
         {/if}
       </div>
@@ -303,3 +427,13 @@
     </div>
   {/if}
 </Modal>
+
+<!-- Member QR Camera Scanner Modal -->
+<BarcodeScannerModal
+  open={memberScannerOpen}
+  onclose={() => (memberScannerOpen = false)}
+  onscan={(scannedCode) => {
+    memberScannerOpen = false;
+    handleSearchMember(scannedCode);
+  }}
+/>

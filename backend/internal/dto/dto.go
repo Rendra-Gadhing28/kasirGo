@@ -98,17 +98,19 @@ type UpdateProductRequest struct {
 
 // Customer DTOs
 type CreateCustomerRequest struct {
-	Name    string `json:"name" validate:"required,min=2,max=255"`
-	Phone   string `json:"phone" validate:"omitempty,max=50"`
-	Email   string `json:"email" validate:"omitempty,email,max=255"`
-	Address string `json:"address" validate:"omitempty,max=1000"`
+	MemberCode string `json:"member_code" validate:"omitempty,max=50"`
+	Name       string `json:"name" validate:"required,min=2,max=255"`
+	Phone      string `json:"phone" validate:"omitempty,max=50"`
+	Email      string `json:"email" validate:"omitempty,email,max=255"`
+	Address    string `json:"address" validate:"omitempty,max=1000"`
 }
 
 type UpdateCustomerRequest struct {
-	Name    string `json:"name" validate:"required,min=2,max=255"`
-	Phone   string `json:"phone" validate:"omitempty,max=50"`
-	Email   string `json:"email" validate:"omitempty,email,max=255"`
-	Address string `json:"address" validate:"omitempty,max=1000"`
+	MemberCode string `json:"member_code" validate:"omitempty,max=50"`
+	Name       string `json:"name" validate:"required,min=2,max=255"`
+	Phone      string `json:"phone" validate:"omitempty,max=50"`
+	Email      string `json:"email" validate:"omitempty,email,max=255"`
+	Address    string `json:"address" validate:"omitempty,max=1000"`
 }
 
 // Supplier DTOs

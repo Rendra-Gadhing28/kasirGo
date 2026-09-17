@@ -207,10 +207,20 @@ func (r *CustomerRepository) FindAll(outletID uint, search string) ([]model.Cust
 	query := r.db.Where("outlet_id = ?", outletID)
 	if search != "" {
 		searchTerm := "%" + strings.ToLower(search) + "%"
-		query = query.Where("LOWER(name) LIKE ? OR phone LIKE ?", searchTerm, searchTerm)
+		query = query.Where("LOWER(name) LIKE ? OR phone LIKE ? OR LOWER(member_code) LIKE ?", searchTerm, searchTerm, searchTerm)
 	}
 	err := query.Order("name asc").Find(&customers).Error
 	return customers, err
+}
+
+func (r *CustomerRepository) FindByMemberCode(outletID uint, code string) (*model.Customer, error) {
+	var customer model.Customer
+	cleanCode := strings.TrimSpace(code)
+	err := r.db.Where("outlet_id = ? AND (member_code = ? OR phone = ? OR LOWER(member_code) = ?)", outletID, cleanCode, cleanCode, strings.ToLower(cleanCode)).First(&customer).Error
+	if err != nil {
+		return nil, err
+	}
+	return &customer, nil
 }
 
 func (r *CustomerRepository) FindByID(outletID, id uint) (*model.Customer, error) {

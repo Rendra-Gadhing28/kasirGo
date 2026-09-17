@@ -18,6 +18,7 @@
 
   let modalOpen = $state(false);
   let editId = $state<number | null>(null);
+  let formMemberCode = $state('');
   let formName = $state('');
   let formPhone = $state('');
   let formEmail = $state('');
@@ -43,6 +44,7 @@
 
   function openCreateModal() {
     editId = null;
+    formMemberCode = '';
     formName = '';
     formPhone = '';
     formEmail = '';
@@ -52,6 +54,7 @@
 
   function openEditModal(c: Customer) {
     editId = c.id;
+    formMemberCode = c.member_code || ('MBR-' + String(c.id).padStart(4, '0'));
     formName = c.name;
     formPhone = c.phone;
     formEmail = c.email;
@@ -67,6 +70,7 @@
     formLoading = true;
     try {
       const payload = {
+        member_code: formMemberCode,
         name: formName,
         phone: formPhone,
         email: formEmail,
@@ -138,6 +142,7 @@
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-[#FFE600] text-black border-b-3 border-black dark:border-white font-black text-xs uppercase tracking-wider">
+            <th class="p-3.5">No. Kartu</th>
             <th class="p-3.5">Nama Pelanggan</th>
             <th class="p-3.5">Kontak / WhatsApp</th>
             <th class="p-3.5">Email</th>
@@ -149,15 +154,20 @@
         <tbody class="divide-y-2 divide-black dark:divide-neutral-700 text-sm font-bold text-black dark:text-white">
           {#if loading}
             <tr>
-              <td colspan="6" class="p-8 text-center text-neutral-500 font-bold">Memuat pelanggan...</td>
+              <td colspan="7" class="p-8 text-center text-neutral-500 font-bold">Memuat pelanggan...</td>
             </tr>
           {:else if customers.length === 0}
             <tr>
-              <td colspan="6" class="p-8 text-center text-neutral-500 font-bold">Tidak ada data pelanggan.</td>
+              <td colspan="7" class="p-8 text-center text-neutral-500 font-bold">Tidak ada data pelanggan.</td>
             </tr>
           {:else}
             {#each customers as cust (cust.id)}
               <tr class="hover:bg-yellow-50 dark:hover:bg-[#252525] transition-colors">
+                <td class="p-3.5 font-mono text-xs">
+                  <span class="bg-black text-white dark:bg-white dark:text-black px-2 py-0.5 border border-black font-black">
+                    {cust.member_code || ('MBR-' + String(cust.id).padStart(4, '0'))}
+                  </span>
+                </td>
                 <td class="p-3.5 font-black">{cust.name}</td>
                 <td class="p-3.5 font-mono text-xs">{cust.phone || '-'}</td>
                 <td class="p-3.5 text-xs text-neutral-500">{cust.email || '-'}</td>
@@ -198,6 +208,7 @@
   onclose={() => (modalOpen = false)}
 >
   <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-3.5">
+    <Input label="No. Kartu Member (Opsional, otomatis dibuat jika kosong)" placeholder="Contoh: MBR-0001" bind:value={formMemberCode} />
     <Input label="Nama Lengkap" placeholder="Budi Santoso" bind:value={formName} required />
     <Input label="Nomor WhatsApp" placeholder="081234567890" bind:value={formPhone} />
     <Input label="Email" type="email" placeholder="budi@gmail.com" bind:value={formEmail} />

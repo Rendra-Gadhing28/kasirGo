@@ -76,36 +76,51 @@
     {:else if registeredMember}
       <!-- MEMBER SUCCESS CARD -->
       <div class="text-center space-y-4">
-        <div class="inline-block bg-[#00E676] px-3 py-1 border-2 border-black font-black text-xs uppercase shadow-[2px_2px_0px_0px_#000000]">
-          Selamat! Kartu Member Aktif
+        <div class="inline-block bg-[#00E676] text-black px-3 py-1 border-2 border-black font-black text-xs uppercase shadow-[2px_2px_0px_0px_#000000]">
+          Selamat! Kartu Member Resmi Aktif
         </div>
 
         <div>
           <h2 class="text-2xl font-black text-black dark:text-white uppercase">{registeredMember.name}</h2>
-          <p class="text-xs font-mono font-bold text-neutral-500">{registeredMember.phone}</p>
-          <p class="text-xs font-bold text-neutral-600 dark:text-neutral-400 mt-1">{outletInfo.name}</p>
+          <div class="inline-flex items-center gap-2 mt-1">
+            <span class="text-xs font-black uppercase bg-black text-white px-2 py-0.5 border border-black">
+              NO. KARTU:
+            </span>
+            <span class="font-mono font-black text-sm text-black dark:text-white bg-[#FFE600] px-2 py-0.5 border border-black">
+              {registeredMember.member_code || ('MBR-' + String(registeredMember.id).padStart(4, '0'))}
+            </span>
+          </div>
+          <p class="text-xs font-mono font-bold text-neutral-500 mt-1">{registeredMember.phone}</p>
+          <p class="text-xs font-bold text-neutral-600 dark:text-neutral-400">{outletInfo.name}</p>
         </div>
 
         <!-- Bonus Points Badge -->
         <div class="p-3 bg-[#FFE600] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000000] font-black">
-          <span class="text-xs uppercase tracking-wider block">Saldo Poin Anda:</span>
+          <span class="text-xs uppercase tracking-wider block">Saldo Poin Member:</span>
           <span class="text-2xl font-mono">{registeredMember.points} POIN</span>
-          <span class="text-[10px] block mt-0.5 text-neutral-800">+1 Poin tiap belanja Rp 10.000</span>
+          <span class="text-[10px] block mt-0.5 text-neutral-800">+1 Poin otomatis tiap belanja Rp 10.000</span>
         </div>
 
         <!-- Digital Member QR Code -->
-        <div class="p-4 bg-white border-3 border-black shadow-[4px_4px_0px_0px_#000000] inline-block">
+        <div class="p-4 bg-white text-black border-3 border-black shadow-[4px_4px_0px_0px_#000000] inline-block">
           <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={encodeURIComponent(registeredMember.phone)}"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={encodeURIComponent(registeredMember.member_code || registeredMember.phone)}"
             alt="Barcode Member"
             class="w-48 h-48 mx-auto border border-black"
           />
-          <div class="mt-2 text-xs font-mono font-black text-black">{registeredMember.phone}</div>
+          <div class="mt-2 text-xs font-mono font-black text-black tracking-widest">
+            {registeredMember.member_code || ('MBR-' + String(registeredMember.id).padStart(4, '0'))}
+          </div>
+          <div class="text-[10px] text-neutral-500 font-bold">{registeredMember.phone}</div>
         </div>
 
-        <p class="text-xs font-bold text-neutral-600 dark:text-neutral-300 max-w-xs mx-auto">
-          Tunjukkan kode QR di atas kepada kasir saat berbelanja untuk mengumpulkan poin belanja!
-        </p>
+        <div class="bg-neutral-100 dark:bg-[#252525] p-3 border-2 border-black dark:border-white text-xs font-bold text-neutral-700 dark:text-neutral-300 max-w-xs mx-auto text-left space-y-1">
+          <div class="font-black text-black dark:text-white uppercase flex items-center gap-1.5">
+            <span>💡</span> Cara Menggunakan:
+          </div>
+          <p>1. <strong>Tunjukkan QR di atas</strong> ke kasir untuk di-scan secara otomatis.</p>
+          <p>2. Atau cukup <strong>sebutkan No. Kartu / No. HP</strong> ke kasir saat checkout.</p>
+        </div>
 
         <button
           onclick={() => { registeredMember = null; }}

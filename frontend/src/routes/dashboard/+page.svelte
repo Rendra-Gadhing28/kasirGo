@@ -46,58 +46,78 @@
     <!-- 4 Key Metrics Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Omset Hari Ini -->
-      <div class="neo-box p-4 bg-[#FFE600] text-black flex flex-col justify-between">
+      <div class="neo-box p-4 bg-white dark:bg-[#1a1a1a] flex flex-col justify-between border-3 border-black dark:border-white shadow-[4px_4px_0px_0px_#000000] dark:shadow-[4px_4px_0px_0px_#ffffff]">
         <div>
-          <span class="text-[11px] font-black uppercase tracking-wider text-black opacity-80">Omset Penjualan Hari Ini</span>
-          <div class="text-2xl font-black font-mono mt-1 text-black">
+          <div class="flex items-center justify-between gap-1 mb-1.5">
+            <span class="text-[11px] font-black uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Omset Hari Ini</span>
+            <span class="bg-[#FFE600] text-black text-[9px] font-black px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000]">
+              OMSET
+            </span>
+          </div>
+          <div class="text-2xl font-black font-mono text-black dark:text-white">
             {formatRupiah(summary.today_revenue)}
           </div>
         </div>
-        <div class="mt-4 pt-2 border-t-2 border-black text-xs font-extrabold flex justify-between text-black">
+        <div class="mt-4 pt-2 border-t-2 border-neutral-200 dark:border-neutral-700 text-xs font-bold flex justify-between text-neutral-700 dark:text-neutral-300">
           <span>{summary.today_transaction_count} Transaksi</span>
-          <span>Sukses Terbayar</span>
+          <span class="text-green-600 dark:text-[#33eb91] font-black">Sukses Terbayar</span>
         </div>
       </div>
 
       <!-- Total Produk -->
-      <div class="neo-box p-4 bg-[#00F0FF] text-black flex flex-col justify-between">
+      <div class="neo-box p-4 bg-white dark:bg-[#1a1a1a] flex flex-col justify-between border-3 border-black dark:border-white shadow-[4px_4px_0px_0px_#000000] dark:shadow-[4px_4px_0px_0px_#ffffff]">
         <div>
-          <span class="text-[11px] font-black uppercase tracking-wider text-black opacity-80">Total Katalog Produk</span>
-          <div class="text-2xl font-black font-mono mt-1 text-black">
+          <div class="flex items-center justify-between gap-1 mb-1.5">
+            <span class="text-[11px] font-black uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Total Katalog Produk</span>
+            <span class="bg-[#00F0FF] text-black text-[9px] font-black px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000]">
+              KATALOG
+            </span>
+          </div>
+          <div class="text-2xl font-black font-mono text-black dark:text-white">
             {summary.total_products} SKU
           </div>
         </div>
-        <div class="mt-4 pt-2 border-t-2 border-black text-xs font-extrabold flex justify-between text-black">
+        <div class="mt-4 pt-2 border-t-2 border-neutral-200 dark:border-neutral-700 text-xs font-bold flex justify-between text-neutral-700 dark:text-neutral-300">
           <span>Stok Siap Jual</span>
-          <a href="/products" class="underline text-black hover:opacity-80">Kelola</a>
+          <a href="/products" class="underline font-black text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400">Kelola</a>
         </div>
       </div>
 
       <!-- Low stock warning -->
-      <div class="neo-box p-4 bg-[#FF5252] text-white flex flex-col justify-between">
+      <div class="neo-box p-4 bg-red-50 dark:bg-[#201010] flex flex-col justify-between border-3 border-red-500 dark:border-red-500 shadow-[4px_4px_0px_0px_#ef4444] dark:shadow-[4px_4px_0px_0px_#ef4444]">
         <div>
-          <span class="text-[11px] font-black uppercase tracking-wider text-white opacity-90">Perhatian Stok Menipis</span>
-          <div class="text-2xl font-black font-mono mt-1 text-white">
+          <div class="flex items-center justify-between gap-1 mb-1.5">
+            <span class="text-[11px] font-black uppercase tracking-wider text-red-700 dark:text-red-400">Perhatian Stok Menipis</span>
+            <span class="bg-[#FF5252] text-white text-[9px] font-black px-1.5 py-0.5 border border-black dark:border-white shadow-[1px_1px_0px_0px_#000000]">
+              ALERT
+            </span>
+          </div>
+          <div class="text-2xl font-black font-mono text-red-600 dark:text-red-400">
             {summary.low_stock_count} Barang
           </div>
         </div>
-        <div class="mt-4 pt-2 border-t-2 border-white text-xs font-extrabold flex justify-between text-white">
-          <span>Stok &le; 10 unit</span>
-          <a href="/products" class="underline text-white hover:opacity-80">Restock</a>
+        <div class="mt-4 pt-2 border-t-2 border-red-200 dark:border-red-900/60 text-xs font-bold flex justify-between text-neutral-700 dark:text-neutral-300">
+          <span class="text-red-600 dark:text-red-400 font-extrabold">Stok &le; 10 unit</span>
+          <a href="/products" class="underline font-black text-red-600 dark:text-red-400 hover:opacity-80">Restock</a>
         </div>
       </div>
 
       <!-- Customers -->
-      <div class="neo-box p-4 bg-[#B388FF] text-black flex flex-col justify-between">
+      <div class="neo-box p-4 bg-white dark:bg-[#1a1a1a] flex flex-col justify-between border-3 border-black dark:border-white shadow-[4px_4px_0px_0px_#000000] dark:shadow-[4px_4px_0px_0px_#ffffff]">
         <div>
-          <span class="text-[11px] font-black uppercase tracking-wider text-black opacity-80">Pelanggan Terdaftar</span>
-          <div class="text-2xl font-black font-mono mt-1 text-black">
+          <div class="flex items-center justify-between gap-1 mb-1.5">
+            <span class="text-[11px] font-black uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Pelanggan Terdaftar</span>
+            <span class="bg-[#B388FF] text-black text-[9px] font-black px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000]">
+              MEMBER
+            </span>
+          </div>
+          <div class="text-2xl font-black font-mono text-black dark:text-white">
             {summary.total_customers} Member
           </div>
         </div>
-        <div class="mt-4 pt-2 border-t-2 border-black text-xs font-extrabold flex justify-between text-black">
+        <div class="mt-4 pt-2 border-t-2 border-neutral-200 dark:border-neutral-700 text-xs font-bold flex justify-between text-neutral-700 dark:text-neutral-300">
           <span>Program Loyalitas</span>
-          <a href="/customers" class="underline text-black hover:opacity-80">Lihat</a>
+          <a href="/customers" class="underline font-black text-black dark:text-white hover:text-purple-600 dark:hover:text-purple-400">Lihat</a>
         </div>
       </div>
     </div>

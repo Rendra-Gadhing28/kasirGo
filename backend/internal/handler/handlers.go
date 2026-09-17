@@ -339,6 +339,16 @@ func (h *CustomerHandler) GetAll(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.StatusOK, "Daftar pelanggan", customers)
 }
 
+func (h *CustomerHandler) LookupMember(c *fiber.Ctx) error {
+	outletID := c.Locals("outlet_id").(uint)
+	code := c.Params("code")
+	customer, err := h.service.FindByMemberCode(outletID, code)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusNotFound, "Member tidak ditemukan")
+	}
+	return utils.SuccessResponse(c, fiber.StatusOK, "Data member ditemukan", customer)
+}
+
 func (h *CustomerHandler) Create(c *fiber.Ctx) error {
 	outletID := c.Locals("outlet_id").(uint)
 	var req dto.CreateCustomerRequest

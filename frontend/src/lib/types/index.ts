@@ -45,6 +45,7 @@ export interface Product {
 export interface Customer {
   id: number;
   outlet_id: number;
+  member_code?: string;
   name: string;
   phone: string;
   email: string;

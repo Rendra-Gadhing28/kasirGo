@@ -107,23 +107,40 @@
   }
 
   async function handleBarcodeDetected(barcode: string) {
-    formBarcode = barcode;
+    const cleanCode = barcode.trim();
+    if (!cleanCode) return;
+    formBarcode = cleanCode;
     if (!formSKU) {
-      formSKU = 'SKU-' + barcode;
+      formSKU = 'SKU-' + cleanCode.slice(-6);
     }
     lookupLoading = true;
-    toast.info('Mencari database produk untuk barcode: ' + barcode + '...');
+    toast.info('Mencari database produk untuk barcode: ' + cleanCode + '...');
     try {
-      const res = await lookupBarcodeInfo(barcode);
-      if (res && res.name) {
+      const res = await lookupBarcodeInfo(cleanCode);
+      if (res && res.found && res.name) {
         formName = res.name;
+        if (res.sku) formSKU = res.sku;
         if (res.unit) formUnit = res.unit;
         if (res.imageUrl) formImageUrl = res.imageUrl;
         if (res.brand) formBrand = res.brand;
+
+        // Auto select matched category
+        if (res.categoryHint && categories.length > 0) {
+          const matched = categories.find((c) =>
+            c.name.toLowerCase().includes(res.categoryHint!.toLowerCase()) ||
+            res.categoryHint!.toLowerCase().includes(c.name.toLowerCase())
+          );
+          if (matched) {
+            formCategoryId = matched.id;
+          }
+        }
+
         toast.success(`Ditemukan: ${res.name} ${res.brand ? '(' + res.brand + ')' : ''}`);
+      } else {
+        toast.info(`Barcode ${cleanCode} belum terdaftar di Open Food Facts. Silakan isi nama produk secara manual.`);
       }
     } catch (e) {
-      // ignore
+      toast.warn('Pencarian katalog selesai. Silakan lengkapi data produk.');
     } finally {
       lookupLoading = false;
     }

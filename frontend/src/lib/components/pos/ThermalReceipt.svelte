@@ -58,7 +58,7 @@
       {#if transaction.customer}
         <div class="flex justify-between">
           <span>Pelanggan:</span>
-          <span class="font-bold">{transaction.customer.name}</span>
+          <span class="font-bold">{transaction.customer.name} ({transaction.customer.member_code || ('MBR-' + String(transaction.customer.id).padStart(4, '0'))})</span>
         </div>
       {/if}
     </div>
@@ -130,6 +130,28 @@
         </div>
       {/if}
     </div>
+
+    <!-- Member Loyalty Points Section -->
+    {#if transaction.customer}
+      {@const earned = Math.floor(transaction.total_amount / 10000)}
+      <div class="py-2 border-b border-dashed border-black text-[11px] space-y-0.5">
+        <div class="font-bold uppercase tracking-wider text-[10px] text-center border-b border-dotted border-black pb-0.5 mb-1">
+          POIN MEMBER LOYALITAS
+        </div>
+        <div class="flex justify-between">
+          <span>No. Kartu:</span>
+          <span class="font-mono font-bold">{transaction.customer.member_code || ('MBR-' + String(transaction.customer.id).padStart(4, '0'))}</span>
+        </div>
+        <div class="flex justify-between font-bold">
+          <span>Poin Dari Transaksi Ini:</span>
+          <span>+{earned} POIN</span>
+        </div>
+        <div class="flex justify-between font-bold pt-0.5 border-t border-dotted border-black">
+          <span>Total Saldo Poin:</span>
+          <span>{transaction.customer.points} POIN</span>
+        </div>
+      </div>
+    {/if}
 
     <!-- Footer Greeting -->
     <div class="text-center pt-3 text-[10px] text-neutral-600 space-y-1">

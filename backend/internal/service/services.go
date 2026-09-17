@@ -374,6 +374,10 @@ func (s *CustomerService) RegisterPublicMember(req dto.PublicMemberRegisterReque
 	existing, _ := s.repo.FindAll(outlet.ID, phone)
 	for _, c := range existing {
 		if c.Phone == phone {
+			if c.MemberCode == "" {
+				c.MemberCode = fmt.Sprintf("MBR-%04d", c.ID)
+				_ = s.repo.Update(&c)
+			}
 			return &c, outlet, nil
 		}
 	}
@@ -391,28 +395,52 @@ func (s *CustomerService) RegisterPublicMember(req dto.PublicMemberRegisterReque
 		return nil, nil, errors.New("gagal mendaftarkan member")
 	}
 
+	// Auto generate unique member code using new customer ID
+	customer.MemberCode = fmt.Sprintf("MBR-%04d", customer.ID)
+	_ = s.repo.Update(customer)
+
 	return customer, outlet, nil
 }
 
 func (s *CustomerService) GetAll(outletID uint, search string) ([]model.Customer, error) {
-	return s.repo.FindAll(outletID, search)
+	customers, err := s.repo.FindAll(outletID, search)
+	if err != nil {
+		return nil, err
+	}
+	// Auto backfill any empty member_code
+	for i := range customers {
+		if customers[i].MemberCode == "" {
+			customers[i].MemberCode = fmt.Sprintf("MBR-%04d", customers[i].ID)
+			_ = s.repo.Update(&customers[i])
+		}
+	}
+	return customers, nil
 }
 
 func (s *CustomerService) GetByID(outletID, id uint) (*model.Customer, error) {
 	return s.repo.FindByID(outletID, id)
 }
 
+func (s *CustomerService) FindByMemberCode(outletID uint, code string) (*model.Customer, error) {
+	return s.repo.FindByMemberCode(outletID, code)
+}
+
 func (s *CustomerService) Create(outletID uint, req dto.CreateCustomerRequest) (*model.Customer, error) {
 	customer := &model.Customer{
-		OutletID: outletID,
-		Name:     utils.SanitizeString(req.Name),
-		Phone:    utils.SanitizeString(req.Phone),
-		Email:    utils.SanitizeString(req.Email),
-		Address:  utils.SanitizeString(req.Address),
-		Points:   0,
+		OutletID:   outletID,
+		MemberCode: utils.SanitizeString(req.MemberCode),
+		Name:       utils.SanitizeString(req.Name),
+		Phone:      utils.SanitizeString(req.Phone),
+		Email:      utils.SanitizeString(req.Email),
+		Address:    utils.SanitizeString(req.Address),
+		Points:     0,
 	}
 	if err := s.repo.Create(customer); err != nil {
 		return nil, err
+	}
+	if customer.MemberCode == "" {
+		customer.MemberCode = fmt.Sprintf("MBR-%04d", customer.ID)
+		_ = s.repo.Update(customer)
 	}
 	return customer, nil
 }
@@ -423,6 +451,9 @@ func (s *CustomerService) Update(outletID, id uint, req dto.UpdateCustomerReques
 		return nil, errors.New("pelanggan tidak ditemukan")
 	}
 
+	if req.MemberCode != "" {
+		customer.MemberCode = utils.SanitizeString(req.MemberCode)
+	}
 	customer.Name = utils.SanitizeString(req.Name)
 	customer.Phone = utils.SanitizeString(req.Phone)
 	customer.Email = utils.SanitizeString(req.Email)
