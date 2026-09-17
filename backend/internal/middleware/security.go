@@ -23,11 +23,10 @@ func CORSMiddleware() fiber.Handler {
 	cfg := config.AppConfig
 	origins := cfg.CORSAllowedOrigins
 	if origins == "" {
-		origins = "https://fish-warming-logos-lots.trycloudflare.com,http://localhost:5173,http://localhost:3000,http://localhost,https://*.vercel.app"
+		origins = "https://fish-warming-logos-lots.trycloudflare.com,http://localhost:5173,http://localhost:3000,http://localhost,https://*.vercel.app,https://*.railway.app"
 	}
 
 	return cors.New(cors.Config{
-		AllowOrigins: origins,
 		AllowOriginsFunc: func(origin string) bool {
 			if origins == "*" {
 				return true
@@ -35,11 +34,14 @@ func CORSMiddleware() fiber.Handler {
 			originList := strings.Split(origins, ",")
 			for _, o := range originList {
 				trimmed := strings.TrimSpace(o)
-				if trimmed == origin {
+				if trimmed == "*" || trimmed == origin {
 					return true
 				}
-				// Support vercel and cloudflare tunnel subdomain matching
+				// Support vercel, railway, and cloudflare tunnel subdomain matching
 				if strings.Contains(trimmed, "vercel.app") && strings.HasSuffix(origin, ".vercel.app") {
+					return true
+				}
+				if strings.Contains(trimmed, "railway.app") && strings.HasSuffix(origin, ".railway.app") {
 					return true
 				}
 				if strings.Contains(trimmed, "trycloudflare.com") && strings.HasSuffix(origin, ".trycloudflare.com") {
