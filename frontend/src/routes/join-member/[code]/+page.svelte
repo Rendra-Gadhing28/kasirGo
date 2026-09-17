@@ -116,7 +116,10 @@
 
         <div class="bg-neutral-100 dark:bg-[#252525] p-3 border-2 border-black dark:border-white text-xs font-bold text-neutral-700 dark:text-neutral-300 max-w-xs mx-auto text-left space-y-1">
           <div class="font-black text-black dark:text-white uppercase flex items-center gap-1.5">
-            <span>💡</span> Cara Menggunakan:
+            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Cara Menggunakan:</span>
           </div>
           <p>1. <strong>Tunjukkan QR di atas</strong> ke kasir untuk di-scan secara otomatis.</p>
           <p>2. Atau cukup <strong>sebutkan No. Kartu / No. HP</strong> ke kasir saat checkout.</p>

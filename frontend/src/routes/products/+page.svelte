@@ -390,9 +390,13 @@
       <button
         type="button"
         onclick={() => (scannerOpen = true)}
-        class="neo-btn bg-black text-white px-3.5 py-1.5 text-xs font-black self-start sm:self-auto"
+        class="neo-btn bg-black text-white px-3.5 py-1.5 text-xs font-black self-start sm:self-auto flex items-center gap-1.5"
       >
-        📷 Scan Kamera HP
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Scan Kamera HP</span>
       </button>
     </div>
 
@@ -409,7 +413,12 @@
           <div class="sm:col-span-2 flex items-center gap-3 p-2 bg-neutral-100 dark:bg-[#252525] border-2 border-black">
             <img src={formImageUrl} alt="Preview Produk" class="w-16 h-16 object-contain bg-white border border-neutral-300" />
             <div class="text-xs">
-              <span class="font-black text-[#00E676] block">✓ Informasi Produk Terdeteksi</span>
+              <span class="font-black text-[#00E676] flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Informasi Produk Terdeteksi</span>
+              </span>
               {#if formBrand}
                 <span class="text-neutral-700 dark:text-neutral-300 font-bold block">Produsen / Merek: {formBrand}</span>
               {/if}
@@ -476,9 +485,12 @@
               type="button"
               onclick={() => (scannerOpen = true)}
               title="Buka Kamera Barcode"
-              class="neo-btn bg-[#00F0FF] text-black px-3 py-2.5 mb-0.5 border-2 text-sm"
+              class="neo-btn bg-[#00F0FF] text-black px-3 py-2.5 mb-0.5 border-2 text-sm flex items-center justify-center"
             >
-              📷
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </button>
           </div>
         </div>

@@ -239,7 +239,10 @@
       <div class="p-3 bg-neutral-50 dark:bg-[#202020] border-2 border-black dark:border-white space-y-2">
         <div class="flex items-center justify-between">
           <label for="member-query" class="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-black dark:text-white">
-            <span>💳</span> Member Toko (Poin Belanja)
+            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <span>Member Toko (Poin Belanja)</span>
           </label>
           {#if selectedCustomer}
             <button
@@ -247,7 +250,7 @@
               onclick={clearMember}
               class="text-[11px] font-black underline text-red-600 dark:text-red-400 hover:opacity-80"
             >
-              × Lepas Member
+              Lepas Member
             </button>
           {/if}
         </div>
@@ -299,10 +302,14 @@
             <button
               type="button"
               onclick={() => (memberScannerOpen = true)}
-              class="neo-btn bg-[#00F0FF] text-black px-3 text-xs font-black flex items-center gap-1"
+              class="neo-btn bg-[#00F0FF] text-black px-3 text-xs font-black flex items-center gap-1.5"
               title="Scan QR Member dari HP Pelanggan"
             >
-              📷 <span>SCAN</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>SCAN</span>
             </button>
           </div>
 
@@ -331,23 +338,32 @@
           <button
             type="button"
             onclick={() => (paymentMethod = 'cash')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'cash' ? 'bg-[#00F0FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
+            class="neo-btn py-3 text-xs font-black flex items-center justify-center gap-1.5 {paymentMethod === 'cash' ? 'bg-[#00F0FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
-            💵 TUNAI (CASH)
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span>TUNAI (CASH)</span>
           </button>
           <button
             type="button"
             onclick={() => (paymentMethod = 'qris')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'qris' ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
+            class="neo-btn py-3 text-xs font-black flex items-center justify-center gap-1.5 {paymentMethod === 'qris' ? 'bg-[#FFE600] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
-            📱 QRIS MIDTRANS
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span>QRIS MIDTRANS</span>
           </button>
           <button
             type="button"
             onclick={() => (paymentMethod = 'transfer')}
-            class="neo-btn py-3 text-xs font-black {paymentMethod === 'transfer' ? 'bg-[#B388FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
+            class="neo-btn py-3 text-xs font-black flex items-center justify-center gap-1.5 {paymentMethod === 'transfer' ? 'bg-[#B388FF] text-black' : 'bg-white dark:bg-[#222] text-black dark:text-white'}"
           >
-            🏦 TRANSFER BANK
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+            </svg>
+            <span>TRANSFER BANK</span>
           </button>
         </div>
       </div>
