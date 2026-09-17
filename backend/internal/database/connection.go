@@ -52,6 +52,14 @@ func InitDB() (*gorm.DB, error) {
 
 	var dsn string
 	if cfg.DatabaseURL != "" {
+		if u, err := url.Parse(cfg.DatabaseURL); err == nil {
+			if h := u.Hostname(); h != "" {
+				cfg.DBHost = h
+			}
+			if p := u.Port(); p != "" {
+				cfg.DBPort = p
+			}
+		}
 		dsn = parseDatabaseURL(cfg.DatabaseURL)
 	} else {
 		tlsParam := ""

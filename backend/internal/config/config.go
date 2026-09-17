@@ -46,18 +46,48 @@ func LoadConfig() *Config {
 	taxRate, _ := strconv.ParseFloat(getEnv("DEFAULT_TAX_RATE", "11"), 64)
 	isProd, _ := strconv.ParseBool(getEnv("MIDTRANS_IS_PRODUCTION", "false"))
 
+	dbURL := getEnv("DATABASE_URL", "")
+	if dbURL == "" {
+		dbURL = getEnv("MYSQL_URL", "")
+	}
+
+	dbHost := getEnv("DB_HOST", "")
+	if dbHost == "" {
+		dbHost = getEnv("MYSQLHOST", "127.0.0.1")
+	}
+
+	dbPort := getEnv("DB_PORT", "")
+	if dbPort == "" {
+		dbPort = getEnv("MYSQLPORT", "3306")
+	}
+
+	dbUser := getEnv("DB_USER", "")
+	if dbUser == "" {
+		dbUser = getEnv("MYSQLUSER", "root")
+	}
+
+	dbPassword := getEnv("DB_PASSWORD", "")
+	if dbPassword == "" {
+		dbPassword = getEnv("MYSQLPASSWORD", "rootpassword")
+	}
+
+	dbName := getEnv("DB_NAME", "")
+	if dbName == "" {
+		dbName = getEnv("MYSQLDATABASE", "kasirpro")
+	}
+
 	cfg := &Config{
 		AppName:              getEnv("APP_NAME", "KasirPro"),
 		AppEnv:               getEnv("APP_ENV", "development"),
 		Port:                 getEnv("PORT", "8080"),
 		AppURL:               getEnv("APP_URL", "https://fish-warming-logos-lots.trycloudflare.com"),
 		CORSAllowedOrigins:   getEnv("CORS_ALLOWED_ORIGINS", "https://fish-warming-logos-lots.trycloudflare.com,http://localhost:5173,http://localhost:3000,http://localhost"),
-		DatabaseURL:          getEnv("DATABASE_URL", ""),
-		DBHost:               getEnv("DB_HOST", "127.0.0.1"),
-		DBPort:               getEnv("DB_PORT", "3306"),
-		DBUser:               getEnv("DB_USER", "root"),
-		DBPassword:           getEnv("DB_PASSWORD", "rootpassword"),
-		DBName:               getEnv("DB_NAME", "kasirpro"),
+		DatabaseURL:          dbURL,
+		DBHost:               dbHost,
+		DBPort:               dbPort,
+		DBUser:               dbUser,
+		DBPassword:           dbPassword,
+		DBName:               dbName,
 		DBSSL:                getEnv("DB_SSL", "false"),
 		JWTSecret:            getEnv("JWT_SECRET", "super_secret_jwt_key_kasirpro_256bit_minimum_length_required!"),
 		JWTAccessExpireMins:  jwtAccessMins,

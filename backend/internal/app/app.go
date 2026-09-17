@@ -43,6 +43,15 @@ func SetupApp() *fiber.App {
 
 	app.Static("/uploads", "./uploads")
 
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status":  "online",
+			"app":     cfg.AppName,
+			"health":  "/api/v1/health",
+			"message": "KasirPro Backend API is running",
+		})
+	})
+
 	api := app.Group("/api/v1")
 
 	// Health check endpoint (always responds even if DB connection failed)
