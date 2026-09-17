@@ -11,7 +11,7 @@ export default defineConfig({
 		port: 5173,
 		proxy: {
 			'/api': {
-				target: process.env.BACKEND_URL || 'http://localhost:8080',
+				target: process.env.BACKEND_URL || 'https://kasirgo-production-ceb2.up.railway.app',
 				changeOrigin: true
 			}
 		}

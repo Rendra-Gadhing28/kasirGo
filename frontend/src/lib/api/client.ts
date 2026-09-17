@@ -34,15 +34,19 @@ class APIClient {
     });
 
     const contentType = response.headers.get('content-type') || '';
+    const text = await response.text();
     let data: APIResponse<T>;
 
     if (contentType.includes('application/json')) {
-      data = await response.json().catch(() => ({
-        success: false,
-        message: `HTTP ${response.status}: Gagal memproses data JSON server.`
-      }));
+      try {
+        data = text ? JSON.parse(text) : { success: false, message: `HTTP ${response.status}: Respon server kosong.` };
+      } catch {
+        data = {
+          success: false,
+          message: `HTTP ${response.status}: Gagal memproses data JSON server (${text.slice(0, 80)}).`
+        };
+      }
     } else {
-      const text = await response.text();
       data = {
         success: response.ok,
         message: response.ok ? 'OK' : `HTTP ${response.status}: Layanan API tidak ditemukan (${text.slice(0, 80)}...)`

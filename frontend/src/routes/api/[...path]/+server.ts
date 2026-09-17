@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
 
-const DEFAULT_HOST_URL = 'https://kasir-go-be.vercel.app';
+const DEFAULT_HOST_URL = 'https://kasirgo-production-ceb2.up.railway.app';
 const BACKEND_INTERNAL_URL = process.env.BACKEND_URL || (process.env.VERCEL ? DEFAULT_HOST_URL : 'http://backend:8080');
 const BACKEND_LOCAL_URL = process.env.BACKEND_URL || DEFAULT_HOST_URL;
 
@@ -29,8 +29,13 @@ async function proxyRequest(event: Parameters<RequestHandler>[0]) {
       redirect: 'manual'
     });
 
+    const responseData = await res.arrayBuffer();
     const responseHeaders = new Headers(res.headers);
-    return new Response(res.body, {
+    responseHeaders.delete('content-encoding');
+    responseHeaders.delete('content-length');
+    responseHeaders.delete('transfer-encoding');
+
+    return new Response(responseData, {
       status: res.status,
       statusText: res.statusText,
       headers: responseHeaders

@@ -44,6 +44,10 @@ func parseDatabaseURL(rawURL string) string {
 func InitDB() (*gorm.DB, error) {
 	cfg := config.AppConfig
 
+	if strings.Contains(cfg.DatabaseURL, "${{") {
+		return nil, fmt.Errorf("DATABASE_URL belum ter-resolve oleh Railway: '%s'. Pastikan format tanpa spasi ${{MySQL.MYSQL_PRIVATE_URL}} atau salin langsung isi MYSQL_PRIVATE_URL dari service MySQL", cfg.DatabaseURL)
+	}
+
 	// In serverless (Vercel), fail immediately if DB_HOST is not configured instead of hanging on 127.0.0.1
 	isVercel := os.Getenv("VERCEL") != ""
 	if isVercel && cfg.DatabaseURL == "" && (cfg.DBHost == "127.0.0.1" || cfg.DBHost == "localhost" || cfg.DBHost == "") {

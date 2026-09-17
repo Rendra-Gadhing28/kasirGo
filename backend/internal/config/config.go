@@ -48,6 +48,9 @@ func LoadConfig() *Config {
 
 	dbURL := getEnv("DATABASE_URL", "")
 	if dbURL == "" {
+		dbURL = getEnv("MYSQL_PRIVATE_URL", "")
+	}
+	if dbURL == "" {
 		dbURL = getEnv("MYSQL_URL", "")
 	}
 
