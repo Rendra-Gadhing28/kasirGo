@@ -1,11 +1,34 @@
 package main
 
 import (
-	_ "kasirpro/internal/config"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"kasirpro/internal/app"
+	"kasirpro/internal/config"
 )
 
-// Forward entry point
 func main() {
-	// Root forwarder to cmd/server
-	// Can be executed via: go run cmd/server/main.go
+	cfg := config.LoadConfig()
+	fiberApp := app.SetupApp()
+
+	// Graceful Shutdown Channel
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		log.Println("Mematikan server KasirPro secara graceful...")
+		_ = fiberApp.Shutdown()
+	}()
+
+	addr := fmt.Sprintf(":%s", cfg.Port)
+	log.Printf("KasirPro Backend Server berjalan pada %s\n", addr)
+	if err := fiberApp.Listen(addr); err != nil {
+		log.Fatalf("Server gagal berjalan: %v", err)
+	}
 }
+
